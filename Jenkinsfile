@@ -10,15 +10,23 @@ podTemplate(
   node ('jenkins-pipeline') {
     stage ('Get Latest') {
       checkout scm
-      def customImage = docker.build("my-image:${env.BUILD_ID}")
-      customImage.push()
+     
+      
+    }
+    stage('Build'){
+         script{
+                def dockerHome = tool 'docker'
+                env.PATH = "${dockerHome}/bin:${env.PATH}"
+                def customImage = docker.build("my-image:${env.BUILD_ID}")
+                customImage.push()
+            }
     }
 
-    stage ('Build') {
-      container ('ng') {
-        sh "npm install"
-        sh "ng build"
-      }
-    }
+    // stage ('Build') {
+    //   container ('ng') {
+    //     sh "npm install"
+    //     sh "ng build"
+    //   }
+    // }
   } // end node
 } // end podTemplate
