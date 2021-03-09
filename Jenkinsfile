@@ -24,7 +24,7 @@ pipeline {
     
      steps {
          script{
-            myapp = docker.build("vamsijakkula/hellowhale:${env.BUILD_ID}")
+            myapp = docker.build("devarajsuk/expresssample:${env.BUILD_ID}")
          }
       }
     }
