@@ -17,11 +17,8 @@ pipeline {
     //   }
     
      steps {
-        container('docker') {
-          sh """
-             docker build -t sample-node:$BUILD_NUMBER .
-          """
-        }
+        def customImage = docker.build("smaple-node:${env.BUILD_ID}")
+
       }
     }
 
