@@ -2,6 +2,12 @@ pipeline {
   agent any
     
   tools {nodejs "node"}
+
+  environment {
+    imagename = "devarajs/samplen-node"
+    registryCredential = 'yenigul-dockerhub'
+    dockerImage = ''
+}
     
   stages {
         
@@ -17,8 +23,7 @@ pipeline {
     //   }
     
      steps {
-        def customImage = docker.build("smaple-node:${env.BUILD_ID}")
-
+        dockerImage = docker.build imagename
       }
     }
 
