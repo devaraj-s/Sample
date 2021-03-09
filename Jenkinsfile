@@ -12,10 +12,18 @@ pipeline {
     }
      
     stage('Build') {
-      steps {
-        sh 'npm install'
+    //   steps {
+    //     sh 'npm install'
+    //   }
+    
+     steps {
+        container('docker') {
+          sh """
+             docker build -t sample-node:$BUILD_NUMBER .
+          """
+        }
       }
-    }  
+    }
 
   }
 }
