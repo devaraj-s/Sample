@@ -18,10 +18,10 @@ spec:
       path: /var/run/docker.sock
 """
   ) {
-  def image = "jenkins/jnlp-slave"
+  def image = "devarajsuk/express-node"
   node(POD_LABEL) {
     stage('Build Docker image') {
-      git 'https://github.com/jenkinsci/docker-jnlp-slave.git'
+      checkout scm
       container('docker') {
         sh "docker build -t ${image} ."
       }
