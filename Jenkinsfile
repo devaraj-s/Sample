@@ -23,7 +23,9 @@ pipeline {
     //   }
     
      steps {
-        myapp = docker.build("vamsijakkula/hellowhale:${env.BUILD_ID}")
+         script{
+            myapp = docker.build("vamsijakkula/hellowhale:${env.BUILD_ID}")
+         }
       }
     }
         stage("Push image") {
