@@ -1,32 +1,30 @@
 #!/usr/bin/groovy
 
-podTemplate(
-  label: 'jenkins-pipeline', 
-  inheritFrom: 'default',
-  containers: [
-    containerTemplate(name: 'ng', image: 'alexsuch/angular-cli:1.6.1', command: 'cat', ttyEnabled: true)
-  ]
-) {
-  node ('jenkins-pipeline') {
-    stage ('Get Latest') {
-      checkout scm
-     
-      
+podTemplate(yaml: """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: docker
+    image: docker:1.11
+    command: ['cat']
+    tty: true
+    volumeMounts:
+    - name: dockersock
+      mountPath: /var/run/docker.sock
+  volumes:
+  - name: dockersock
+    hostPath:
+      path: /var/run/docker.sock
+"""
+  ) {
+  def image = "jenkins/jnlp-slave"
+  node(POD_LABEL) {
+    stage('Build Docker image') {
+      git 'https://github.com/jenkinsci/docker-jnlp-slave.git'
+      container('docker') {
+        sh "docker build -t ${image} ."
+      }
     }
-    stage('Build'){
-         script{
-                def dockerHome = tool 'docker'
-                env.PATH = "${dockerHome}/bin:${env.PATH}"
-                def customImage = docker.build("my-image:${env.BUILD_ID}")
-                customImage.push()
-            }
-    }
-
-    // stage ('Build') {
-    //   container ('ng') {
-    //     sh "npm install"
-    //     sh "ng build"
-    //   }
-    // }
-  } // end node
-} // end podTemplate
+  }
+}
