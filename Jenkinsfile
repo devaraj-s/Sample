@@ -1,52 +1,22 @@
-pipeline {
-  agent any
-    
-  tools {nodejs "node"}
+#!/usr/bin/groovy
 
-  environment {
-    imagename = "devarajs/samplen-node"
-    registryCredential = 'yenigul-dockerhub'
-    dockerImage = ''
-}
-    
-  stages {
-        
-    stage('Git') {
-      steps {
-        checkout scm
+podTemplate(
+  label: 'jenkins-pipeline', 
+  inheritFrom: 'default',
+  containers: [
+    containerTemplate(name: 'ng', image: 'alexsuch/angular-cli:1.6.1', command: 'cat', ttyEnabled: true)
+  ]
+) {
+  node ('jenkins-pipeline') {
+    stage ('Get Latest') {
+      checkout scm
+    }
+
+    stage ('Build') {
+      container ('ng') {
+        sh "npm install"
+        sh "ng build"
       }
     }
-     
-    stage('Initialize'){
-        steps {
-            script{
-                def dockerHome = tool 'docker'
-                env.PATH = "${dockerHome}/bin:${env.PATH}"
-            }
-        }
-    }
-
-    stage('Build') {
-    //   steps {
-    //     sh 'npm install'
-    //   }
-    
-     steps {
-         script{
-            myapp = docker.build("devarajsuk/expresssample:${env.BUILD_ID}")
-         }
-      }
-    }
-        stage("Push image") {
-            steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
-                            myapp.push("latest")
-                            myapp.push("${env.BUILD_ID}")
-                    }
-                }
-            }
-        }
-
-  }
-}
+  } // end node
+} // end podTemplate
